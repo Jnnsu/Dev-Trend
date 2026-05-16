@@ -569,7 +569,7 @@ export default function Home() {
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
             <div style={{display:'flex',alignItems:'center',gap:8}}>
               <span style={{fontSize:20}}>⬡</span>
-              <span style={{fontWeight:800,fontSize:15,letterSpacing:'-0.5px'}}>GitHub 트렌드 KR</span>
+              <span style={{fontWeight:800,fontSize:15,letterSpacing:'-0.5px'}}>Dev Trend</span>
             </div>
             <button onClick={()=>setShowKo(v=>!v)} style={{background:'#21262d',border:'1px solid #30363d',color:'#e6edf3',padding:'4px 14px',borderRadius:20,fontSize:12,fontWeight:600}}>
               {showKo?'🇰🇷 한국어':'🇺🇸 English'}
