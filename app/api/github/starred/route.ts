@@ -25,6 +25,6 @@ export async function GET(req: NextRequest) {
   )
 
   if (!res.ok) return NextResponse.json({ error: `GitHub API 오류: ${res.status}` }, { status: res.status })
-  const data = await res.json()
+  const data = (await res.json()) as unknown[]
   return NextResponse.json({ items: data, hasMore: data.length >= perPage })
 }

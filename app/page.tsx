@@ -32,13 +32,14 @@ const LANGUAGES = [
   {label:'Go',value:'Go'},{label:'Rust',value:'Rust'},{label:'Java',value:'Java'},
 ]
 const PERIODS = [
-  {label:'오늘',value:'daily'},{label:'이번 주',value:'weekly'},{label:'이번 달',value:'monthly'},
+  {label:'오늘',value:'daily'},{label:'이번 주',value:'weekly'},
 ]
 const TABS = [
-  {id:'trending',label:'🔥 요즘 트렌드'},
-  {id:'new',label:'🆕 신규 인기'},
-  {id:'devnews',label:'📰 개발 뉴스'},
-  {id:'mylist',label:'⭐ 내 목록'},
+  {id:'best',label:'⭐ Best'},
+  {id:'new',label:'🔥 New'},
+  {id: 'community',label: '👥 Community'},
+  {id:'geeknews',label:'📰 GeekNews'},
+  {id:'mylist',label:'📌 My List'},
 ]
 const DEV_CATS = [
   {label:'전체',value:''},{label:'Frontend',value:'프론트엔드'},
@@ -257,14 +258,14 @@ function NewsCard({item,showKo, onClick}:{item:NewsItem;showKo:boolean; onClick?
   )
 }
 
-/* ── Trending Tab ───────────────────────────────────────────────────── */
-function TrendingTab({showKo}:{showKo:boolean}) {
+/* ── Best Tab ───────────────────────────────────────────────────── */
+function BestTab({showKo}:{showKo:boolean}) {
   const [lang,setLang] = useState('')
   const [period,setPeriod] = useState('weekly')
   const [loadedPeriod,setLoadedPeriod] = useState<string|null>(null)
 
   const fetcher = useCallback(async (page: number) => {
-    const res = await fetch(`/api/trending?period=${period}&page=${page}`)
+    const res = await fetch(`/api/best?period=${period}&page=${page}`)
     const data = await res.json()
     if (!res.ok) throw new Error(data.error)
     setLoadedPeriod(period)
@@ -277,6 +278,7 @@ function TrendingTab({showKo}:{showKo:boolean}) {
 
   return (
     <div>
+      <p style={{color:'#8b949e',fontSize:12,marginBottom:12}}>업데이트 기간별 가장 인기 있는 레포</p>
       <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
         {PERIODS.map(p=><PeriodBtn key={p.value} active={period===p.value} onClick={()=>setPeriod(p.value)}>{p.label}</PeriodBtn>)}
         <div style={{width:1,background:'#21262d',alignSelf:'stretch'}}/>
@@ -289,7 +291,7 @@ function TrendingTab({showKo}:{showKo:boolean}) {
         </div>
       )}
       {error&&<ErrBox msg={error}/>}
-      {!initialized&&!loading&&<EmptyState icon="🔥" title="GitHub 트렌딩" sub="AI가 인기 저장소를 한국어로 정리해드려요" btnLabel="불러오기" onBtn={loadFirst}/>}
+      {!initialized&&!loading&&<EmptyState icon="⭐" title="Best Repos" sub="GitHub Best 레포를 정리해드려요" btnLabel="불러오기" onBtn={loadFirst}/>}
       {initialized&&<RefreshRow count={displayed.length} onRefresh={loadFirst}/>}
       {loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>{[...Array(5)].map((_,i)=><Skeleton key={i}/>)}</div>}
       {!loading&&(
@@ -318,12 +320,12 @@ function NewTab({showKo}:{showKo:boolean}) {
 
   return (
     <div>
-      <p style={{color:'#8b949e',fontSize:12,marginBottom:12}}>최근 30일 이내 생성, 스타 급상승 프로젝트</p>
+      <p style={{color:'#8b949e',fontSize:12,marginBottom:12}}>최근 30일 이내 생성된 스타 급상승 레포</p>
       <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
         {LANGUAGES.map(l=><FilterBtn key={l.value} active={lang===l.value} onClick={()=>setLang(l.value)}>{l.label}</FilterBtn>)}
       </div>
       {error&&<ErrBox msg={error}/>}
-      {!initialized&&!loading&&<EmptyState icon="🆕" title="신규 인기 저장소" sub="30일 이내 생성 스타 급상승" btnLabel="불러오기" onBtn={loadFirst}/>}
+      {!initialized&&!loading&&<EmptyState icon="🔥" title="New Repos" sub="신생 스타 급상승 레포를 정리해드려요" btnLabel="불러오기" onBtn={loadFirst}/>}
       {initialized&&<RefreshRow count={displayed.length} onRefresh={loadFirst}/>}
       {loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>{[...Array(5)].map((_,i)=><Skeleton key={i}/>)}</div>}
       {!loading&&(
@@ -338,14 +340,16 @@ function NewTab({showKo}:{showKo:boolean}) {
 }
 
 /* ── Dev News Tab ───────────────────────────────────────────────────── */
-function DevNewsTab({showKo}:{showKo:boolean}) {
+function CommunityTab({showKo}:{showKo:boolean}) {
   const [cat,setCat] = useState('')
-  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null) 
   const today = new Date().toISOString().split('T')[0]
   const fetcher = useCallback(async (page: number) => {
-    const res = await fetch(`/api/dev-news?page=${page}`)
+    const res = await fetch(`/api/community?page=${page}`)
     const data = await res.json()
+
     if (!res.ok) throw new Error(data.error)
+
     return data
   }, [])
   const {items:all,loading,loadingMore,error,hasMore,initialized,loadFirst,sentinelRef} = useInfiniteLoad<NewsItem>(fetcher)
@@ -353,12 +357,12 @@ function DevNewsTab({showKo}:{showKo:boolean}) {
 
   return (
     <div>
-      <p style={{color:'#8b949e',fontSize:12,marginBottom:12}}>{today} 기준 최신 개발 뉴스</p>
+      <p style={{color:'#8b949e',fontSize:12,marginBottom:12}}>{today} Hacker News 인기글</p>
       <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
         {DEV_CATS.map(c=><FilterBtn key={c.value} active={cat===c.value} onClick={()=>setCat(c.value)}>{c.label}</FilterBtn>)}
       </div>
       {error&&<ErrBox msg={error}/>}
-      {!initialized&&!loading&&<EmptyState icon="📰" title="개발 트렌드" sub="오늘 기준 최신 뉴스를 가져와요" btnLabel="불러오기" onBtn={loadFirst}/>}
+      {!initialized&&!loading&&<EmptyState icon="👥" title="Community" sub="Hacker News 인기 글을 가져와요" btnLabel="불러오기" onBtn={loadFirst}/>}
       {initialized&&<RefreshRow count={displayed.length} onRefresh={loadFirst}/>}
       {loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>{[...Array(4)].map((_,i)=><Skeleton key={i}/>)}</div>}
       {!loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>
@@ -370,14 +374,55 @@ function DevNewsTab({showKo}:{showKo:boolean}) {
       {initialized&&!loading&&hasMore&&!cat&&<div ref={sentinelRef} style={{height:20}}/>}
 
       {selectedNews&&(
-        <NewsModal item={selectedNews} showKo={showKo} onClose={()=>setSelectedNews(null)}/>
+        <Modal item={selectedNews} showKo={showKo} onClose={()=>setSelectedNews(null)}/>
       )}
     </div>
   )
 }
 
-/* ── News Modal ───────────────────────────────────────────────────── */
-function NewsModal({item, showKo, onClose}: {item: NewsItem; showKo: boolean; onClose: () => void}) {
+/* ── Geek News Tab ───────────────────────────────────────────────────── */
+function GeekNewsTab({showKo}:{showKo:boolean}) {
+  const [cat,setCat] = useState('')
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
+  const today = new Date().toISOString().split('T')[0]
+  const fetcher = useCallback(async (page: number) => {
+    const res = await fetch(`/api/geek-news?page=${page}`)
+    const data = await res.json()
+
+    if (!res.ok) throw new Error(data.error)
+
+    return data
+  }, [])
+  const {items:all,loading,loadingMore,error,hasMore,initialized,loadFirst,sentinelRef} = useInfiniteLoad<NewsItem>(fetcher)
+  const displayed = cat ? all.filter(n=>n.category===cat) : all
+
+  return (
+    <div>
+      <p style={{color:'#8b949e',fontSize:12,marginBottom:12}}>{today} GeekNews</p>
+      <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
+        {DEV_CATS.map(c=><FilterBtn key={c.value} active={cat===c.value} onClick={()=>setCat(c.value)}>{c.label}</FilterBtn>)}
+      </div>
+      {error&&<ErrBox msg={error}/>}
+      {!initialized&&!loading&&<EmptyState icon="📰" title="GeekNews" sub="GeekNews 기반 주요 글을 가져와요" btnLabel="불러오기" onBtn={loadFirst}/>}
+      {initialized && <RefreshRow count={displayed?.length || 0} onRefresh={loadFirst}/>}
+      {loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>{[...Array(4)].map((_,i)=><Skeleton key={i}/>)}</div>}
+      {!loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>
+        {(displayed || []).map((item,i)=>(
+          <NewsCard key={i} item={item} showKo={showKo} onClick={()=>setSelectedNews(item)}/>
+        ))}
+      </div>}
+      {loadingMore&&<div style={{textAlign:'center',padding:20,color:'#8b949e',fontSize:13}}>최신 뉴스 더 검색 중…</div>}
+      {initialized&&!loading&&hasMore&&!cat&&<div ref={sentinelRef} style={{height:20}}/>}
+
+      {selectedNews&&(
+        <Modal item={selectedNews} showKo={showKo} onClose={()=>setSelectedNews(null)}/>
+      )}
+    </div>
+  )
+}
+
+/* ── Modal ───────────────────────────────────────────────────── */
+function Modal({item, showKo, onClose}: {item: NewsItem; showKo: boolean; onClose: () => void}) {
   const [detail, setDetail] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const color = CAT_COLORS[item.category || ''] || '#8b949e'
@@ -521,7 +566,7 @@ function MyListTab({user,showKo}:{user:User|null;showKo:boolean}) {
         <button onClick={()=>loadRepos(mode)} style={{marginLeft:'auto',background:'none',border:'1px solid #30363d',color:'#8b949e',padding:'4px 14px',borderRadius:6,cursor:'pointer',fontSize:12}}>🔄 다시 불러오기</button>
       </div>
       {error&&<ErrBox msg={error}/>}
-      {repos.length===0&&!loading&&<EmptyState icon="⭐" title="불러오기를 눌러주세요" btnLabel="불러오기" onBtn={()=>loadRepos(mode)}/>}
+      {repos.length===0&&!loading&&<EmptyState icon="📌" title="My List" btnLabel="불러오기" onBtn={()=>loadRepos(mode)}/>}
       {loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>{[...Array(5)].map((_,i)=><Skeleton key={i}/>)}</div>}
       {!loading&&<div style={{display:'flex',flexDirection:'column',gap:10}}>
         {repos.map((repo:Repo)=>(
@@ -543,7 +588,7 @@ function MyListTab({user,showKo}:{user:User|null;showKo:boolean}) {
 
 /* ── App ────────────────────────────────────────────────────────────── */
 export default function Home() {
-  const [tab,setTab] = useState('trending')
+  const [tab,setTab] = useState('best')
   const [showKo,setShowKo] = useState(true)
   const [user,setUser] = useState<User|null>(null)
   const supabase = createClient()
@@ -587,10 +632,25 @@ export default function Home() {
 
       {/* Content - 탭 상태 유지 (display 토글) */}
       <main style={{maxWidth:720,margin:'0 auto',padding:'20px 16px'}}>
-        <div style={{display:tab==='trending'?'block':'none'}}><TrendingTab showKo={showKo}/></div>
-        <div style={{display:tab==='new'?'block':'none'}}><NewTab showKo={showKo}/></div>
-        <div style={{display:tab==='devnews'?'block':'none'}}><DevNewsTab showKo={showKo}/></div>
-        <div style={{display:tab==='mylist'?'block':'none'}}><MyListTab user={user} showKo={showKo}/></div>
+        <div style={{display:tab==='best'?'block':'none'}}>
+          <BestTab showKo={showKo}/>
+        </div>
+
+        <div style={{display:tab==='new'?'block':'none'}}>
+          <NewTab showKo={showKo}/>
+        </div>
+
+        <div style={{display:tab==='community'?'block':'none'}}>
+          <CommunityTab showKo={showKo}/>
+        </div>
+
+        <div style={{display:tab==='geeknews'?'block':'none'}}>
+          <GeekNewsTab showKo={showKo}/>
+        </div>
+
+        <div style={{display:tab==='mylist'?'block':'none'}}>
+          <MyListTab user={user} showKo={showKo}/>
+        </div>
       </main>
     </>
   )

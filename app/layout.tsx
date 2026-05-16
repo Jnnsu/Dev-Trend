@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Dev Trend',
-  description: '요즘 개발 트렌드가 궁금할 때, AI가 분석한 최신 정보를 한눈에 확인하세요.',
+  description: '요즘 개발 트렌드가 궁금할 때, 최신 정보를 한눈에 확인하고 AI 요약으로 시간을 절약하세요.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
