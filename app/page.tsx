@@ -10,7 +10,6 @@ interface Repo {
   language?: string | null; stars?: string; forks?: string | null
   todayStars?: string | null; createdAt?: string; description?: string
   summary?: string; tags?: string[]
-  // GitHub API raw fields (내 목록 탭)
   owner_obj?: { login: string; avatar_url: string }
   stargazers_count?: number; forks_count?: number; html_url?: string
   full_name?: string; topics?: string[]
@@ -384,7 +383,6 @@ function NewsModal({item, showKo, onClose}: {item: NewsItem; showKo: boolean; on
   const color = CAT_COLORS[item.category || ''] || '#8b949e'
 
   useEffect(() => {
-    // 모달 열리면 상세 내용 자동 fetch
     setLoading(true)
     fetch(`/api/news-detail?title=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.url || '')}`)
       .then(r => r.json())
@@ -393,7 +391,6 @@ function NewsModal({item, showKo, onClose}: {item: NewsItem; showKo: boolean; on
       .finally(() => setLoading(false))
   }, [item.title])
 
-  // 배경 클릭 시 닫기
   const handleBg = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose()
   }

@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
 
   const isFirst = page === 1
   try {
-    // useSearch: true → Google Search grounding으로 실시간 뉴스 검색
     const text = await geminiJSON(
       'You are a tech news expert. Respond ONLY with a valid JSON array. No markdown code blocks. Start with [ end with ].',
       `오늘은 ${today}야. 최근 2~4주 이내 실제 주요 개발 뉴스 찾아줘.
