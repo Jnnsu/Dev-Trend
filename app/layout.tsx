@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'GitHub 트렌드 KR',
-  description: 'GitHub 트렌딩을 한국어로 매일 받아보세요',
+  title: 'Dev Trend',
+  description: '요즘 개발 트렌드가 궁금할 때, AI가 분석한 최신 정보를 한눈에 확인하세요.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
