@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite'
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'
 
 export function parseJSONArray(text: string): unknown[] {
   const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
